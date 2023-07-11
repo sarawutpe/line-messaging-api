@@ -3,9 +3,6 @@ const line = require("@line/bot-sdk");
 const crypto = require("crypto");
 require("dotenv").config();
 
-const app = express();
-const PORT = process.env.PORT || 3000;
-
 const config = {
   channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
   channelSecret: process.env.CHANNEL_SECRET,
@@ -19,6 +16,9 @@ function verifySignature(signature, body) {
   const hash = hmac.update(body).digest("base64");
   return hash === signature;
 }
+
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.get("/", (req, res) => {
   res.send("ok");
