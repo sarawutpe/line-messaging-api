@@ -13,22 +13,35 @@ const config = {
 // create LINE SDK client
 const client = new line.Client(config);
 
-function verifySignature(signature, body) {
-  const channelSecret = config.channelSecret;
-  const hmac = crypto.createHmac("SHA256", channelSecret);
-  const hash = hmac.update(body).digest("base64");
-  return hash === signature;
-}
+app.get("/", (req, res) => {
+  const channelSecret = config.channelAccessToken;
+  const body = "hello";
+  const signature = crypto
+    .createHmac("SHA256", channelSecret)
+    .update(body)
+    .digest("base64");
 
-app.post("/webhook", (req, res) => {
-  const signature = req.headers["x-line-signature"];
-  const body = JSON.stringify(req.body);
+  res.send(`ok ${signature}`);
+});
 
-  if (!verifySignature(signature, body)) {
-    res.status(401).send("Invalid signature");
-    return;
+app.get("/send/:text", async (req, res) => {
+  try {
+    const text = req.params.text || "";
+
+    const message = {
+      type: "text",
+      text: text,
+    };
+
+    const result = await client.pushMessage(config.channelSecret, message);
+    res.json({ code: 200, message: result });
+  } catch (error) {
+    res.status(error.statusCode).send(error.message);
   }
+});
 
+// about the middleware, please refer to doc
+app.post("/webhook", line.middleware(config), (req, res) => {
   Promise.all(req.body.events.map(handleEvent))
     .then((result) => res.json(result))
     .catch((err) => {
