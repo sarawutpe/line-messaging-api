@@ -26,11 +26,8 @@ app.get("/send/:text", async (req, res) => {
       text: text,
     };
 
-    const res = await client.pushMessage(config.channelSecret, message);
-
-    res.json({ code: 200, message: res });
-    console.log(push);
-    res.send(push);
+    const result = await client.pushMessage(config.channelSecret, message);
+    res.json({ code: 200, message: result });
   } catch (error) {
     res.status(error.statusCode).send(error.message);
   }
