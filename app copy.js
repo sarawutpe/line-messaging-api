@@ -14,14 +14,7 @@ const config = {
 const client = new line.Client(config);
 
 app.get("/", (req, res) => {
-  const channelSecret = config.channelAccessToken;
-  const body = "hello";
-  const signature = crypto
-    .createHmac("SHA256", channelSecret)
-    .update(body)
-    .digest("base64");
-
-  res.send(`ok ${signature}`);
+  res.send('ok');
 });
 
 app.get("/send/:text", async (req, res) => {

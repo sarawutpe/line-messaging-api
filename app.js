@@ -20,6 +20,10 @@ function verifySignature(signature, body) {
   return hash === signature;
 }
 
+app.get("/", (req, res) => {
+  res.send("ok");
+});
+
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
     const signature = req.headers["x-line-signature"];
@@ -30,8 +34,13 @@ app.post("/webhook", line.middleware(config), async (req, res) => {
       return;
     }
 
-    const result = await Promise.all(req.body.events.map(handleEvent));
-    res.json(result);
+    const events = req.body.events;
+
+    if (events.length > 0) {
+      await events.map((item) => handleEvent(item));
+    } else {
+      res.status(200).send("ok");
+    }
   } catch (err) {
     console.error(err);
     res.status(500).end();
