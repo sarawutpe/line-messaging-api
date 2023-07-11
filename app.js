@@ -12,9 +12,14 @@ const client = new line.Client(config);
 
 function verifySignature(signature, body) {
   const channelSecret = config.channelSecret;
-  const hmac = crypto.createHmac("SHA256", channelSecret);
-  const hash = hmac.update(body).digest("base64");
-  return hash === signature;
+  const bodystring = JSON.stringify(body);
+
+  const hash = crypto
+    .createHmac("SHA256", channelSecret)
+    .update(bodystring)
+    .digest("base64");
+
+  return signature === hash;
 }
 
 const app = express();
@@ -27,7 +32,7 @@ app.get("/", (req, res) => {
 app.post("/webhook", line.middleware(config), async (req, res) => {
   try {
     const signature = req.headers["x-line-signature"];
-    const body = JSON.stringify(req.body);
+    const body = req.body;
 
     if (!verifySignature(signature, body)) {
       res.status(401).send("Invalid signature");
