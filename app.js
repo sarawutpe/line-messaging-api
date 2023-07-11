@@ -46,7 +46,7 @@ function handleEvent(event) {
   // Create a new message.
   const response = {
     type: "text",
-    text,
+    text: "hello",
   };
 
   // use reply API
