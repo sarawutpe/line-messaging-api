@@ -59,8 +59,6 @@ function handleEvent(event) {
     text: "hello",
   };
 
-  console.log(event);
-
   // use reply API
   return client.replyMessage(event.replyToken, response);
 }
